@@ -14,6 +14,7 @@ import {
 	editTodoActionCreator,
 	toggleTodoActionCreator,
 	deleteTodoActionCreator,
+	fetchData,
 } from '../redux-toolkit';
 
 import './App.css';
@@ -56,6 +57,10 @@ const App = function() {
 		setEditTodoInput(selectedTodo.desc);
 		setIsEditMode(true);
 	};
+
+	useEffect(() => {
+		dispatch(fetchData());
+	}, []);
 
 	useEffect(() => {
 		if (isEditMode) {

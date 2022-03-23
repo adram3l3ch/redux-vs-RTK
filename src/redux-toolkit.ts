@@ -1,7 +1,36 @@
-import { createSlice, configureStore, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, configureStore, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import { v1 as uuid } from 'uuid';
 import { Todo } from './type';
+
+export const fetchData = createAsyncThunk(
+	'products/fetch',
+	async (props, { dispatch, getState, rejectWithValue }) => {
+		try {
+			const resp = await fetch('https://fakestoreapi.com/products');
+			const data = await resp.json();
+			dispatch(todosSlice.actions.create({ desc: 'hello' }));
+			return data;
+		} catch (error) {
+			// rejectWithValue(error.response.data);
+		}
+	}
+);
+
+const productsSlice = createSlice({
+	name: 'products',
+	initialState: { list: [], status: null },
+	reducers: {},
+	extraReducers: {
+		[fetchData.fulfilled.type]: (state: any, action: any) => {
+			state.list = action.payload;
+			state.status = 'success';
+		},
+		[fetchData.rejected.type]: (state: any, action: any) => {
+			state.status = 'error';
+		},
+	},
+});
 
 const initialTodos = [
 	{
@@ -79,6 +108,7 @@ export default configureStore({
 		todos: todosSlice.reducer,
 		selectedTodo: selectedTodoSlice.reducer,
 		counter: counterSlice.reducer,
+		products: productsSlice.reducer,
 	},
 	middleware: getDMW => [...getDMW(), logger],
 });
